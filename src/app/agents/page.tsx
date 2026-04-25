@@ -8,7 +8,7 @@ import Header from '@/components/Header';
 import { Search, CheckCircle2, Clock, PauseCircle, Circle, ArrowRight, Users } from 'lucide-react';
 import { useT } from '@/lib/i18n';
 
-function DonutRing({ percent, color, size = 80, strokeWidth = 8 }: {
+function DonutRing({ percent, color, size = 60, strokeWidth = 7 }: {
   percent: number; color: string; size?: number; strokeWidth?: number;
 }) {
   const r = (size - strokeWidth) / 2;
@@ -17,7 +17,7 @@ function DonutRing({ percent, color, size = 80, strokeWidth = 8 }: {
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`}
       style={{ transform: 'rotate(-90deg)', display: 'block' }}>
-      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.08)" strokeWidth={strokeWidth} />
+      <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke="rgba(255,255,255,0.06)" strokeWidth={strokeWidth} />
       <circle cx={size / 2} cy={size / 2} r={r} fill="none" stroke={color} strokeWidth={strokeWidth}
         strokeDasharray={`${dash} ${circ - dash}`} strokeLinecap="round" />
     </svg>
@@ -35,37 +35,43 @@ function AgentCard({ agent, stat, selected, onClick }: {
   const [first, ...rest] = agent.name.split(' ');
   return (
     <button onClick={onClick}
-      className={`relative group flex flex-col items-center gap-3 p-5 rounded-2xl border transition-all duration-200 text-center w-full ${
-        selected ? 'border-2 shadow-lg scale-[1.03]' : 'border border-slate-700/50 bg-slate-800/50 hover:bg-slate-800 hover:border-slate-600 hover:scale-[1.02] hover:shadow-md hover:shadow-black/30'
+      className={`relative flex flex-col items-center gap-2 p-3 rounded-xl border transition-all duration-200 text-center w-full ${
+        selected
+          ? 'border-slate-500 bg-slate-700/60 shadow-md'
+          : 'border border-slate-700/40 bg-slate-800/40 hover:bg-slate-800/70 hover:border-slate-600 hover:shadow-sm'
       }`}
-      style={selected ? {
-        borderColor: agent.color,
-        background: `linear-gradient(145deg, ${agent.color}22 0%, rgba(15,23,42,0.9) 60%)`,
-        boxShadow: `0 0 24px ${agent.color}40`,
-      } : undefined}
     >
+      {/* Avatar + ring */}
       <div className="relative">
-        <DonutRing percent={stat.completionRate} color={rc} size={80} strokeWidth={7} />
+        <DonutRing percent={stat.completionRate} color={rc} size={56} strokeWidth={6} />
         <div className="absolute inset-0 flex items-center justify-center">
-          <div className="w-11 h-11 rounded-full flex items-center justify-center text-white text-xs font-bold shadow-md"
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-white text-[10px] font-bold"
             style={{ backgroundColor: agent.color }}>{agent.initials}</div>
         </div>
       </div>
-      <span className="text-base font-bold" style={{ color: rc }}>{stat.completionRate}%</span>
+
+      {/* Rate */}
+      <span className="text-xs font-bold" style={{ color: rc }}>{stat.completionRate}%</span>
+
+      {/* Name */}
       <div>
-        <div className="text-sm font-semibold text-white truncate max-w-[130px]">{first}</div>
-        {rest.length > 0 && <div className="text-xs text-slate-400 truncate max-w-[130px]">{rest.join(' ')}</div>}
+        <div className="text-xs font-semibold text-white truncate max-w-[110px]">{first}</div>
+        {rest.length > 0 && <div className="text-[10px] text-slate-500 truncate max-w-[110px]">{rest.join(' ')}</div>}
       </div>
-      <div className="w-full h-1.5 rounded-full overflow-hidden flex bg-slate-700/60">
-        {stat.completed > 0 && <div className="h-full bg-emerald-500" style={{ width: `${(stat.completed / stat.totalTasks) * 100}%` }} />}
-        {stat.inProgress > 0 && <div className="h-full bg-blue-500" style={{ width: `${(stat.inProgress / stat.totalTasks) * 100}%` }} />}
-        {stat.onHold > 0 && <div className="h-full bg-amber-500" style={{ width: `${(stat.onHold / stat.totalTasks) * 100}%` }} />}
+
+      {/* Progress bar */}
+      <div className="w-full h-1 rounded-full overflow-hidden flex bg-slate-700/50">
+        {stat.completed > 0 && <div className="h-full bg-emerald-500/80" style={{ width: `${(stat.completed / stat.totalTasks) * 100}%` }} />}
+        {stat.inProgress > 0 && <div className="h-full bg-blue-500/80" style={{ width: `${(stat.inProgress / stat.totalTasks) * 100}%` }} />}
+        {stat.onHold > 0 && <div className="h-full bg-amber-500/80" style={{ width: `${(stat.onHold / stat.totalTasks) * 100}%` }} />}
         {stat.notStarted > 0 && <div className="h-full bg-slate-600" style={{ width: `${(stat.notStarted / stat.totalTasks) * 100}%` }} />}
       </div>
-      <div className="text-[10px] text-slate-500">{stat.totalTasks} t.</div>
+
+      <div className="text-[9px] text-slate-600">{stat.totalTasks}</div>
+
       {selected && (
-        <div className="absolute top-2.5 right-2.5 w-5 h-5 rounded-full flex items-center justify-center" style={{ backgroundColor: agent.color }}>
-          <CheckCircle2 size={11} className="text-white" />
+        <div className="absolute top-2 right-2 w-4 h-4 rounded-full bg-slate-500 flex items-center justify-center">
+          <CheckCircle2 size={10} className="text-white" />
         </div>
       )}
     </button>
@@ -96,42 +102,39 @@ export default function AgentsPage() {
       <div className="flex-1 overflow-y-auto">
 
         {/* Hero */}
-        <div className="relative px-4 sm:px-6 pt-6 sm:pt-8 pb-5 sm:pb-6 overflow-hidden"
-          style={{ background: 'linear-gradient(135deg, rgba(99,102,241,0.12) 0%, rgba(15,23,42,0) 60%)' }}>
-          <div className="absolute inset-0 pointer-events-none"
-            style={{ background: 'radial-gradient(ellipse at 20% 50%, rgba(99,102,241,0.08) 0%, transparent 70%)' }} />
-          <div className="relative max-w-3xl mx-auto text-center mb-5">
-            <div className="flex items-center justify-center gap-2 mb-2">
-              <div className="w-8 h-8 rounded-xl bg-indigo-600 flex items-center justify-center">
-                <Users size={16} className="text-white" />
+        <div className="px-4 sm:px-6 pt-5 pb-4">
+          <div className="max-w-3xl mx-auto text-center mb-4">
+            <div className="flex items-center justify-center gap-2 mb-1.5">
+              <div className="w-7 h-7 rounded-lg bg-slate-700 flex items-center justify-center">
+                <Users size={14} className="text-slate-300" />
               </div>
-              <span className="text-xs font-medium text-indigo-400 uppercase tracking-wider">{t('agents.rosterLabel')}</span>
+              <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">{t('agents.rosterLabel')}</span>
             </div>
-            <h2 className="text-xl sm:text-2xl font-bold text-white mb-1">{t('agents.heading')}</h2>
-            <p className="text-sm text-slate-400">{t('agents.subheading')}</p>
+            <h2 className="text-lg sm:text-xl font-bold text-white mb-1">{t('agents.heading')}</h2>
+            <p className="text-xs text-slate-500">{t('agents.subheading')}</p>
           </div>
-          <div className="relative max-w-md mx-auto">
-            <Search size={16} className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
+          <div className="max-w-md mx-auto relative">
+            <Search size={14} className="absolute left-3.5 top-1/2 -translate-y-1/2 text-slate-500" />
             <input type="text" placeholder={t('agents.search')} value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-11 pr-4 py-3 bg-slate-800/80 border border-slate-700 rounded-2xl text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors shadow-lg" />
+              className="w-full pl-10 pr-4 py-2.5 bg-slate-800/70 border border-slate-700/60 rounded-xl text-sm text-white placeholder-slate-600 focus:outline-none focus:border-slate-500 transition-colors" />
             {search && (
               <button onClick={() => setSearch('')}
-                className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors text-xs">✕</button>
+                className="absolute right-3.5 top-1/2 -translate-y-1/2 text-slate-500 hover:text-white transition-colors text-xs">✕</button>
             )}
           </div>
         </div>
 
-        <div className="px-4 sm:px-6 pb-10 space-y-6">
+        <div className="px-4 sm:px-6 pb-10 space-y-5">
           {filtered.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-16 text-center">
-              <div className="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-4">
-                <Search size={20} className="text-slate-500" />
+              <div className="w-12 h-12 rounded-xl bg-slate-800 border border-slate-700 flex items-center justify-center mb-3">
+                <Search size={16} className="text-slate-600" />
               </div>
-              <p className="text-slate-400 text-sm">{t('agents.noMatch')} "{search}"</p>
+              <p className="text-slate-500 text-sm">{t('agents.noMatch')} "{search}"</p>
             </div>
           ) : (
-            <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-4 lg:grid-cols-5 xl:grid-cols-6 gap-3 sm:gap-4">
+            <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-2 sm:gap-2.5">
               {filtered.map((agent) => {
                 const s = stats.find((x) => x.agentId === agent.id) ?? defaultStat;
                 return (
@@ -145,24 +148,23 @@ export default function AgentsPage() {
 
           {/* Detail panel */}
           {selected && selectedStats && (
-            <div className="rounded-3xl overflow-hidden border"
-              style={{ borderColor: `${selected.color}50`, background: `linear-gradient(135deg, ${selected.color}18 0%, rgba(15,23,42,0.95) 50%)` }}>
+            <div className="rounded-2xl overflow-hidden border border-slate-700/50 bg-slate-800/50">
               <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-0">
 
                 {/* Ring */}
-                <div className="flex flex-col items-center justify-center px-6 sm:px-10 py-6 sm:py-8 gap-4 lg:border-r border-slate-700/30">
+                <div className="flex flex-col items-center justify-center px-6 sm:px-10 py-5 sm:py-7 gap-3 lg:border-r border-slate-700/30">
                   <div className="relative">
-                    <DonutRing percent={selectedStats.completionRate} color={rateColor(selectedStats.completionRate)} size={140} strokeWidth={12} />
+                    <DonutRing percent={selectedStats.completionRate} color={rateColor(selectedStats.completionRate)} size={120} strokeWidth={10} />
                     <div className="absolute inset-0 flex flex-col items-center justify-center">
-                      <div className="w-[70px] h-[70px] rounded-full flex items-center justify-center text-white text-lg font-bold shadow-xl"
+                      <div className="w-[60px] h-[60px] rounded-full flex items-center justify-center text-white text-base font-bold shadow-lg"
                         style={{ backgroundColor: selected.color }}>{selected.initials}</div>
                     </div>
                   </div>
                   <div className="text-center">
-                    <div className="text-2xl font-bold" style={{ color: rateColor(selectedStats.completionRate) }}>
+                    <div className="text-xl font-bold" style={{ color: rateColor(selectedStats.completionRate) }}>
                       {selectedStats.completionRate}%
                     </div>
-                    <div className="flex items-center gap-1.5 justify-center mt-1">
+                    <div className="flex items-center gap-1.5 justify-center mt-0.5">
                       <div className="w-1.5 h-1.5 rounded-full" style={{ backgroundColor: rateColor(selectedStats.completionRate) }} />
                       <span className="text-xs text-slate-400">{rateLabel(selectedStats.completionRate)}</span>
                     </div>
@@ -170,33 +172,33 @@ export default function AgentsPage() {
                 </div>
 
                 {/* Stats */}
-                <div className="px-5 sm:px-8 py-6 sm:py-8 space-y-5 sm:space-y-6">
+                <div className="px-5 sm:px-7 py-5 sm:py-7 space-y-4">
                   <div>
-                    <h3 className="text-xl sm:text-2xl font-bold text-white">{selected.name}</h3>
-                    <p className="text-sm text-slate-400 mt-0.5">{selected.role}</p>
+                    <h3 className="text-lg sm:text-xl font-bold text-white">{selected.name}</h3>
+                    <p className="text-xs text-slate-500 mt-0.5">{selected.role}</p>
                   </div>
-                  <div className="grid grid-cols-4 gap-2 sm:gap-3">
+                  <div className="grid grid-cols-4 gap-2">
                     {([
                       ['agents.done',    selectedStats.completed,  '#10B981', CheckCircle2],
                       ['agents.active',  selectedStats.inProgress, '#3B82F6', Clock],
                       ['agents.hold',    selectedStats.onHold,     '#F59E0B', PauseCircle],
                       ['agents.pending', selectedStats.notStarted, '#6B7280', Circle],
                     ] as [Parameters<typeof t>[0], number, string, React.ElementType][]).map(([key, value, color, Icon]) => (
-                      <div key={key} className="flex flex-col items-center gap-1.5 p-2 sm:p-3 rounded-2xl bg-slate-900/40 border border-slate-700/30">
-                        <Icon size={14} style={{ color }} />
-                        <span className="text-lg sm:text-2xl font-bold text-white">{value}</span>
-                        <span className="text-[10px] text-slate-500">{t(key)}</span>
+                      <div key={key} className="flex flex-col items-center gap-1 p-2 sm:p-2.5 rounded-xl bg-slate-900/40 border border-slate-700/30">
+                        <Icon size={13} style={{ color }} />
+                        <span className="text-base sm:text-xl font-bold text-white">{value}</span>
+                        <span className="text-[9px] text-slate-500">{t(key)}</span>
                       </div>
                     ))}
                   </div>
                   <div>
-                    <div className="flex justify-between text-xs mb-2">
+                    <div className="flex justify-between text-xs mb-1.5">
                       <span className="text-slate-400">{t('agents.overall')}</span>
-                      <span className="font-semibold" style={{ color: rateColor(selectedStats.completionRate) }}>
+                      <span className="font-semibold text-slate-300">
                         {selectedStats.completed} / {selectedStats.totalTasks} {t('agents.tasks')}
                       </span>
                     </div>
-                    <div className="h-3 bg-slate-700/50 rounded-full overflow-hidden flex">
+                    <div className="h-2 bg-slate-700/50 rounded-full overflow-hidden flex">
                       {selectedStats.completed > 0 && <div className="h-full bg-emerald-500 transition-all duration-700" style={{ width: `${(selectedStats.completed / selectedStats.totalTasks) * 100}%` }} />}
                       {selectedStats.inProgress > 0 && <div className="h-full bg-blue-500 transition-all duration-700" style={{ width: `${(selectedStats.inProgress / selectedStats.totalTasks) * 100}%` }} />}
                       {selectedStats.onHold > 0 && <div className="h-full bg-amber-500 transition-all duration-700" style={{ width: `${(selectedStats.onHold / selectedStats.totalTasks) * 100}%` }} />}
@@ -206,14 +208,13 @@ export default function AgentsPage() {
                 </div>
 
                 {/* CTA */}
-                <div className="flex items-center justify-center px-6 sm:px-8 py-6 sm:py-8 lg:border-l border-slate-700/30">
+                <div className="flex items-center justify-center px-5 sm:px-7 py-5 sm:py-7 lg:border-l border-slate-700/30">
                   <button onClick={() => router.push(`/agent/${selected.id}`)}
-                    className="flex flex-col items-center gap-3 px-6 sm:px-8 py-4 sm:py-5 rounded-2xl text-white font-semibold transition-all hover:scale-105 hover:shadow-xl group"
-                    style={{ backgroundColor: selected.color, boxShadow: `0 4px 20px ${selected.color}40` }}>
-                    <ArrowRight size={24} className="group-hover:translate-x-1 transition-transform" />
+                    className="flex flex-col items-center gap-2 px-5 sm:px-7 py-3 sm:py-4 rounded-xl bg-slate-700 hover:bg-slate-600 text-white font-semibold transition-all hover:scale-105 hover:shadow-lg group border border-slate-600">
+                    <ArrowRight size={20} className="group-hover:translate-x-1 transition-transform" />
                     <div className="text-center">
-                      <div className="text-sm font-bold">{t('agents.viewTasks')}</div>
-                      <div className="text-xs opacity-80 mt-0.5">{t('agents.weekly')}</div>
+                      <div className="text-xs font-bold">{t('agents.viewTasks')}</div>
+                      <div className="text-[10px] text-slate-400 mt-0.5">{t('agents.weekly')}</div>
                     </div>
                   </button>
                 </div>
@@ -222,8 +223,8 @@ export default function AgentsPage() {
           )}
 
           {!selected && filtered.length > 0 && (
-            <div className="flex flex-col items-center justify-center py-8 text-center">
-              <p className="text-slate-500 text-sm">{t('agents.clickHint')}</p>
+            <div className="flex flex-col items-center justify-center py-6 text-center">
+              <p className="text-slate-600 text-xs">{t('agents.clickHint')}</p>
             </div>
           )}
         </div>

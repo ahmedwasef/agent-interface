@@ -13,7 +13,7 @@ interface LangState {
 export const useLangStore = create<LangState>()(
   persist(
     (set) => ({
-      lang: 'en',
+      lang: 'fr',
       toggle: () => set((s) => ({ lang: s.lang === 'en' ? 'fr' : 'en' })),
     }),
     { name: 'maad-lang' }
