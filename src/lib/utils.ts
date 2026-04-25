@@ -1,5 +1,5 @@
-import { Task, TaskStatus, WeeklyStats, DaySummary } from './types';
-import { AGENTS } from './agents';
+import { Task, TaskStatus, WeeklyStats, DaySummary, Agent } from './types';
+import { AGENTS as DEFAULT_AGENTS } from './agents';
 
 export const STATUS_LABELS: Record<TaskStatus, string> = {
   not_started: 'Not Started',
@@ -28,8 +28,9 @@ export const PRIORITY_COLORS: Record<string, string> = {
   high:   'bg-red-500/20 text-red-300 border-red-500/30',
 };
 
-export function getWeeklyStats(tasks: Task[]): WeeklyStats[] {
-  return AGENTS.map((agent) => {
+// agents param is optional — defaults to hardcoded list for backward compat
+export function getWeeklyStats(tasks: Task[], agents: Agent[] = DEFAULT_AGENTS): WeeklyStats[] {
+  return agents.map((agent) => {
     const agentTasks = tasks.filter((t) => t.agentId === agent.id);
     const completed  = agentTasks.filter((t) => t.status === 'completed').length;
     const inProgress = agentTasks.filter((t) => t.status === 'in_progress').length;
@@ -83,50 +84,46 @@ export function formatDateTime(isoStr: string): string {
   });
 }
 
-export function exportToCSV(tasks: Task[]): void {
+// agents param is optional — defaults to hardcoded list
+export function exportToCSV(tasks: Task[], agents: Agent[] = DEFAULT_AGENTS): void {
   const headers = [
-    // Identity
     'Task ID', 'SWAT ID', 'Agent ID', 'Agent Name',
-    // SWAT reference columns
     'CODIF', 'GROUPE', 'PROJET', 'AVION', 'Position', 'Cahier', 'RV', 'RFC',
     'STATUT RV', 'PERIODE', 'Programme', 'Superviseur', 'Manager',
     'DT1', 'DT2', '%PROD', 'Harmo Manuel',
-    // Task fields
     'Date', 'Day', 'Priority', 'Priorité #', 'Est. Hours', 'Status',
     'Created At', 'Updated At',
-    // Status history (up to 4 changes — PowerBI time-intelligence friendly)
     'SC1 Status', 'SC1 Timestamp', 'SC1 Changed By', 'SC1 Note',
     'SC2 Status', 'SC2 Timestamp', 'SC2 Changed By', 'SC2 Note',
     'SC3 Status', 'SC3 Timestamp', 'SC3 Changed By', 'SC3 Note',
     'SC4 Status', 'SC4 Timestamp', 'SC4 Changed By', 'SC4 Note',
-    // Description & notes
     'Description (Commentaire)', 'Notes (SWAT DESCR.)',
   ];
 
-  const agentMap = new Map(AGENTS.map((a) => [a.id, a.name]));
+  const agentMap = new Map(agents.map((a) => [a.id, a.name]));
 
   const rows = tasks.map((task) => {
     const row: string[] = [
       task.id,
-      task.swatId    || '',
+      task.swatId      || '',
       task.agentId,
       agentMap.get(task.agentId) || '',
-      task.codif     || task.category,
-      task.groupe    || '',
-      task.projet    || '',
-      task.avion     || '',
-      task.position  || '',
-      task.cahier    || '',
-      task.rv        || '',
-      task.rfc       || '',
-      task.statutRv  || '',
-      task.periode   || '',
-      task.programme || '',
+      task.codif       || task.category,
+      task.groupe      || '',
+      task.projet      || '',
+      task.avion       || '',
+      task.position    || '',
+      task.cahier      || '',
+      task.rv          || '',
+      task.rfc         || '',
+      task.statutRv    || '',
+      task.periode     || '',
+      task.programme   || '',
       task.superviseur || '',
-      task.manager   || '',
+      task.manager     || '',
       task.dt1 !== undefined ? String(task.dt1) : '',
       task.dt2 !== undefined ? String(task.dt2) : '',
-      task.pctProd   !== undefined ? String(task.pctProd) : '',
+      task.pctProd !== undefined ? String(task.pctProd) : '',
       task.harmoManuel ? 'VRAI' : 'FAUX',
       task.date,
       task.dayName,
@@ -138,7 +135,6 @@ export function exportToCSV(tasks: Task[]): void {
       task.updatedAt,
     ];
 
-    // Status change columns (up to 4)
     for (let i = 0; i < 4; i++) {
       const change = task.statusHistory[i];
       if (change) {
