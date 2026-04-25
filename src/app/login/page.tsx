@@ -18,7 +18,7 @@ export default function LoginPage() {
     if (currentUser) router.replace('/');
   }, [currentUser, router]);
 
-  const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setError('');
     setLoading(true);
@@ -41,8 +41,8 @@ export default function LoginPage() {
             <BarChart2 size={22} className="text-white" />
           </div>
           <div>
-            <div className="text-white font-bold text-lg leading-tight">Agent Interface</div>
-            <div className="text-indigo-400 text-xs">SWAT Task Management</div>
+            <div className="text-white font-bold text-lg leading-tight">Methods Agent Alpha</div>
+            <div className="text-indigo-400 text-xs">Damien/Constance equipe</div>
           </div>
         </div>
 

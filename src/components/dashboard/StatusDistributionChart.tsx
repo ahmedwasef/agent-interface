@@ -47,14 +47,14 @@ export default function StatusDistributionChart({ tasks }: Props) {
   return (
     <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
       <h3 className="text-sm font-semibold text-white mb-4">Status Distribution</h3>
-      <ResponsiveContainer width="100%" height={280}>
+      <ResponsiveContainer width="100%" height={360}>
         <PieChart>
           <Pie
             data={data}
             cx="50%"
             cy="45%"
-            outerRadius={90}
-            innerRadius={45}
+            outerRadius={130}
+            innerRadius={65}
             dataKey="value"
             labelLine={false}
             label={renderLabel}

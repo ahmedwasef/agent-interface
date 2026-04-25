@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { WeeklyStats } from '@/lib/types';
-import { AGENTS } from '@/lib/agents';
+import { useStore } from '@/lib/store';
 import { ChevronRight } from 'lucide-react';
 
 interface Props {
@@ -10,6 +10,7 @@ interface Props {
 }
 
 export default function TeamTable({ stats }: Props) {
+  const { agents } = useStore();
   const sorted = [...stats].sort((a, b) => b.completionRate - a.completionRate);
 
   return (
@@ -35,7 +36,7 @@ export default function TeamTable({ stats }: Props) {
           </thead>
           <tbody>
             {sorted.map((s, i) => {
-              const agent = AGENTS.find((a) => a.id === s.agentId);
+              const agent = agents.find((a) => a.id === s.agentId);
               return (
                 <tr
                   key={s.agentId}

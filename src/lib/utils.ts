@@ -84,69 +84,56 @@ export function formatDateTime(isoStr: string): string {
   });
 }
 
-// agents param is optional — defaults to hardcoded list
+// CSV export uses exact same column headers as the SWAT PowerBI import template
 export function exportToCSV(tasks: Task[], agents: Agent[] = DEFAULT_AGENTS): void {
   const headers = [
-    'Task ID', 'SWAT ID', 'Agent ID', 'Agent Name',
-    'CODIF', 'GROUPE', 'PROJET', 'AVION', 'Position', 'Cahier', 'RV', 'RFC',
-    'STATUT RV', 'PERIODE', 'Programme', 'Superviseur', 'Manager',
-    'DT1', 'DT2', '%PROD', 'Harmo Manuel',
-    'Date', 'Day', 'Priority', 'Priorité #', 'Est. Hours', 'Status',
-    'Created At', 'Updated At',
-    'SC1 Status', 'SC1 Timestamp', 'SC1 Changed By', 'SC1 Note',
-    'SC2 Status', 'SC2 Timestamp', 'SC2 Changed By', 'SC2 Note',
-    'SC3 Status', 'SC3 Timestamp', 'SC3 Changed By', 'SC3 Note',
-    'SC4 Status', 'SC4 Timestamp', 'SC4 Changed By', 'SC4 Note',
-    'Description (Commentaire)', 'Notes (SWAT DESCR.)',
+    'SWAT', 'PROJET', 'AVION', 'Position', 'Cahier', 'RV', 'CODIF', '%PROD',
+    'RESPONSABLE', 'DATE PS', 'DATE RV', 'DT1', 'GROUPE', 'RFC', 'STATUT RV',
+    'PERIODE', 'Commentaire', 'DT2', 'Superviseur', 'SWAT DESCR.', 'Priorité',
+    'Programme', 'Manager', 'Meuble', 'DATE METHODES', 'DATE ALGO',
+    'Harmo Manuel', 'SumTime_Estimate_Hours',
   ];
 
   const agentMap = new Map(agents.map((a) => [a.id, a.name]));
 
-  const rows = tasks.map((task) => {
-    const row: string[] = [
-      task.id,
-      task.swatId      || '',
-      task.agentId,
-      agentMap.get(task.agentId) || '',
-      task.codif       || task.category,
-      task.groupe      || '',
-      task.projet      || '',
-      task.avion       || '',
-      task.position    || '',
-      task.cahier      || '',
-      task.rv          || '',
-      task.rfc         || '',
-      task.statutRv    || '',
-      task.periode     || '',
-      task.programme   || '',
-      task.superviseur || '',
-      task.manager     || '',
-      task.dt1 !== undefined ? String(task.dt1) : '',
-      task.dt2 !== undefined ? String(task.dt2) : '',
-      task.pctProd !== undefined ? String(task.pctProd) : '',
-      task.harmoManuel ? 'VRAI' : 'FAUX',
-      task.date,
-      task.dayName,
-      task.priority,
-      task.prioriteNum !== undefined ? String(task.prioriteNum) : '',
-      String(task.estimatedHours),
-      STATUS_LABELS[task.status],
-      task.createdAt,
-      task.updatedAt,
-    ];
+  // Map internal status back to SWAT STATUT RV vocabulary
+  const toStatutRv = (status: TaskStatus): string => {
+    if (status === 'completed')   return 'CLOSED';
+    if (status === 'in_progress') return 'PREPARE';
+    if (status === 'on_hold')     return 'ATT';
+    return 'TBD';
+  };
 
-    for (let i = 0; i < 4; i++) {
-      const change = task.statusHistory[i];
-      if (change) {
-        row.push(STATUS_LABELS[change.status], change.timestamp, change.changedBy, change.note || '');
-      } else {
-        row.push('', '', '', '');
-      }
-    }
-
-    row.push(task.description, task.notes);
-    return row;
-  });
+  const rows = tasks.map((task) => [
+    task.swatId      || '',
+    task.projet      || '',
+    task.avion       || '',
+    task.position    || '',
+    task.cahier      || '',
+    task.rv          || '',
+    task.codif       || task.category || '',
+    task.pctProd !== undefined ? String(task.pctProd) : '0',
+    agentMap.get(task.agentId) || '',
+    '',                                             // DATE PS — not stored
+    task.date,
+    task.dt1 !== undefined ? String(task.dt1) : '',
+    task.groupe      || '',
+    task.rfc         || '',
+    task.statutRv    || toStatutRv(task.status),
+    task.periode     || '',
+    task.description || '',
+    task.dt2 !== undefined ? String(task.dt2) : '',
+    task.superviseur || '',
+    task.notes       || '',
+    task.prioriteNum !== undefined ? String(task.prioriteNum) : '',
+    task.programme   || '',
+    task.manager     || '',
+    '',                                             // Meuble — not stored
+    '',                                             // DATE METHODES — not stored
+    '',                                             // DATE ALGO — not stored
+    task.harmoManuel ? 'VRAI' : 'FAUX',
+    String(task.estimatedHours),
+  ]);
 
   const csv = [headers, ...rows]
     .map((r) => r.map((v) => `"${String(v).replace(/"/g, '""')}"`).join(','))

@@ -7,8 +7,8 @@ import AppShell from "@/components/AppShell";
 const inter = Inter({ subsets: ["latin"] });
 
 export const metadata: Metadata = {
-  title: "Agent Interface — SWAT Task Dashboard",
-  description: "Secure SWAT team task management and monitoring platform.",
+  title: "Methods Agent Alpha DashBoard",
+  description: "SWAT task management platform — Damien/Constance equipe.",
 };
 
 export default function RootLayout({ children }: Readonly<{ children: React.ReactNode }>) {

@@ -3,13 +3,13 @@
 import { useEffect, useState } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
-import { AGENTS } from '@/lib/agents';
+import { useAuthStore } from '@/lib/authStore';
 import { TaskStatus } from '@/lib/types';
 import { STATUS_LABELS, STATUS_BG, STATUS_COLORS, PRIORITY_COLORS, formatDate, formatDateTime } from '@/lib/utils';
 import Header from '@/components/Header';
 import {
   ArrowLeft, CheckCircle2, Clock, PauseCircle, Circle,
-  Calendar, User, BarChart2, FileText, Save, History, Info,
+  Calendar, User, BarChart2, FileText, Save, History, Info, Lock,
 } from 'lucide-react';
 
 const STATUS_OPTIONS: { value: TaskStatus; label: string; icon: React.ReactNode; desc: string }[] = [
@@ -31,10 +31,10 @@ function Field({ label, value }: { label: string; value?: string | number | bool
 
 export default function TaskPage() {
   const { taskId } = useParams<{ taskId: string }>();
-  const { tasks, updateTaskStatus, updateTaskNotes, initialize } = useStore();
+  const { tasks, agents, updateTaskStatus, updateTaskNotes, initialize } = useStore();
+  const { currentUser } = useAuthStore();
   const router = useRouter();
   const [note, setNote] = useState('');
-  const [changedBy, setChangedBy] = useState('');
   const [taskNotes, setTaskNotes] = useState('');
   const [saved, setSaved] = useState(false);
 
@@ -47,11 +47,18 @@ export default function TaskPage() {
 
   if (!task) return <div className="p-6 text-slate-400">Task not found.</div>;
 
-  const agent = AGENTS.find((a) => a.id === task.agentId);
+  const agent = agents.find((a) => a.id === task.agentId);
+
+  // Only the assigned agent, admin, or supervisor may change status
+  const canChangeStatus =
+    currentUser?.role === 'admin' ||
+    currentUser?.role === 'supervisor' ||
+    (currentUser?.role === 'agent' && currentUser?.agentId === task.agentId);
 
   const handleStatusChange = (newStatus: TaskStatus) => {
-    if (newStatus === task.status) return;
-    updateTaskStatus(task.id, newStatus, changedBy.trim() || agent?.name || 'Unknown', note.trim() || undefined);
+    if (newStatus === task.status || !canChangeStatus) return;
+    const changer = currentUser?.displayName || agent?.name || 'Unknown';
+    updateTaskStatus(task.id, newStatus, changer, note.trim() || undefined);
     setNote('');
   };
 
@@ -94,7 +101,6 @@ export default function TaskPage() {
                 </div>
               </div>
 
-              {/* Description */}
               {task.description && (
                 <div className="bg-slate-900/50 rounded-lg p-4 mb-5">
                   <div className="text-xs text-slate-400 font-medium mb-2 uppercase tracking-wide">Commentaire</div>
@@ -102,7 +108,6 @@ export default function TaskPage() {
                 </div>
               )}
 
-              {/* Core fields grid */}
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-4 text-xs">
                 <div className="flex items-start gap-2">
                   <User size={13} className="text-slate-500 mt-0.5 flex-shrink-0" />
@@ -135,27 +140,41 @@ export default function TaskPage() {
                 SWAT References
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
-                <Field label="SWAT" value={task.swatId} />
-                <Field label="PROJET" value={task.projet} />
-                <Field label="AVION" value={task.avion} />
-                <Field label="Cahier" value={task.cahier} />
-                <Field label="RV" value={task.rv} />
-                <Field label="RFC" value={task.rfc} />
-                <Field label="GROUPE" value={task.groupe} />
-                <Field label="PERIODE" value={task.periode} />
-                <Field label="STATUT RV" value={task.statutRv} />
-                <Field label="Programme" value={task.programme} />
+                <Field label="SWAT"       value={task.swatId} />
+                <Field label="PROJET"     value={task.projet} />
+                <Field label="AVION"      value={task.avion} />
+                <Field label="Cahier"     value={task.cahier} />
+                <Field label="RV"         value={task.rv} />
+                <Field label="RFC"        value={task.rfc} />
+                <Field label="GROUPE"     value={task.groupe} />
+                <Field label="PERIODE"    value={task.periode} />
+                <Field label="STATUT RV"  value={task.statutRv} />
+                <Field label="Programme"  value={task.programme} />
                 <Field label="Superviseur" value={task.superviseur} />
-                <Field label="Position" value={task.position} />
-                <Field label="DT1" value={task.dt1 !== undefined ? `${task.dt1} days` : null} />
-                <Field label="DT2" value={task.dt2 !== undefined ? `${task.dt2}` : null} />
+                <Field label="Position"   value={task.position} />
+                <Field label="DT1"        value={task.dt1 !== undefined ? `${task.dt1} days` : null} />
+                <Field label="DT2"        value={task.dt2 !== undefined ? `${task.dt2}` : null} />
                 <Field label="Harmo Manuel" value={task.harmoManuel ? 'VRAI' : 'FAUX'} />
               </div>
             </div>
 
             {/* Status changer */}
             <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
-              <h3 className="text-sm font-semibold text-white mb-4">Update Status</h3>
+              <div className="flex items-center justify-between mb-4">
+                <h3 className="text-sm font-semibold text-white">Update Status</h3>
+                {!canChangeStatus && (
+                  <div className="flex items-center gap-1.5 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg">
+                    <Lock size={12} />
+                    Only the assigned agent, supervisor, or admin can change status
+                  </div>
+                )}
+                {canChangeStatus && currentUser && (
+                  <span className="text-xs text-slate-400">
+                    Changing as <span className="text-indigo-300 font-medium">{currentUser.displayName}</span>
+                  </span>
+                )}
+              </div>
+
               <div className="grid grid-cols-2 gap-3 mb-5">
                 {STATUS_OPTIONS.map((opt) => {
                   const isActive = task.status === opt.value;
@@ -163,8 +182,11 @@ export default function TaskPage() {
                     <button
                       key={opt.value}
                       onClick={() => handleStatusChange(opt.value)}
+                      disabled={!canChangeStatus}
                       className={`flex items-start gap-3 p-4 rounded-xl border text-left transition-all ${
-                        isActive
+                        !canChangeStatus
+                          ? 'opacity-40 cursor-not-allowed border-slate-700'
+                          : isActive
                           ? 'border-indigo-500 bg-indigo-500/10'
                           : 'border-slate-700 hover:border-slate-500 hover:bg-slate-700/30'
                       }`}
@@ -179,14 +201,8 @@ export default function TaskPage() {
                   );
                 })}
               </div>
-              <div className="space-y-3">
-                <input
-                  type="text"
-                  placeholder="Changed by (your name)"
-                  value={changedBy}
-                  onChange={(e) => setChangedBy(e.target.value)}
-                  className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors"
-                />
+
+              {canChangeStatus && (
                 <textarea
                   placeholder="Add a note about this status change (optional)"
                   value={note}
@@ -194,10 +210,10 @@ export default function TaskPage() {
                   rows={2}
                   className="w-full px-3 py-2.5 bg-slate-900 border border-slate-700 rounded-lg text-sm text-white placeholder-slate-500 focus:outline-none focus:border-indigo-500 transition-colors resize-none"
                 />
-              </div>
+              )}
             </div>
 
-            {/* Notes — SWAT DESCR. */}
+            {/* Notes */}
             <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
               <h3 className="flex items-center gap-2 text-sm font-semibold text-white mb-4">
                 <FileText size={14} />
@@ -224,7 +240,6 @@ export default function TaskPage() {
 
           {/* ── Side column ── */}
           <div className="space-y-5">
-            {/* Status history */}
             <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
               <h3 className="flex items-center gap-2 text-sm font-semibold text-white mb-4">
                 <History size={14} />
@@ -255,7 +270,6 @@ export default function TaskPage() {
               </div>
             </div>
 
-            {/* Metadata */}
             <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 text-xs space-y-2">
               <div className="flex justify-between">
                 <span className="text-slate-500">Task ID</span>
