@@ -5,19 +5,13 @@ import { useParams, useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { useAuthStore } from '@/lib/authStore';
 import { TaskStatus } from '@/lib/types';
-import { STATUS_LABELS, STATUS_BG, STATUS_COLORS, PRIORITY_COLORS, formatDate, formatDateTime } from '@/lib/utils';
+import { STATUS_BG, STATUS_COLORS, PRIORITY_COLORS, formatDate, formatDateTime } from '@/lib/utils';
 import Header from '@/components/Header';
+import { useT } from '@/lib/i18n';
 import {
   ArrowLeft, CheckCircle2, Clock, PauseCircle, Circle,
   Calendar, User, BarChart2, FileText, Save, History, Info, Lock,
 } from 'lucide-react';
-
-const STATUS_OPTIONS: { value: TaskStatus; label: string; icon: React.ReactNode; desc: string }[] = [
-  { value: 'not_started', label: 'Not Started',  icon: <Circle size={16} />,       desc: 'Task has not been started yet' },
-  { value: 'in_progress', label: 'In Progress',  icon: <Clock size={16} />,         desc: 'Currently being worked on' },
-  { value: 'on_hold',     label: 'On Hold',       icon: <PauseCircle size={16} />,   desc: 'Paused — waiting for input' },
-  { value: 'completed',   label: 'Completed',     icon: <CheckCircle2 size={16} />,  desc: 'Task finished successfully' },
-];
 
 function Field({ label, value }: { label: string; value?: string | number | boolean | null }) {
   if (!value && value !== 0) return null;
@@ -30,6 +24,7 @@ function Field({ label, value }: { label: string; value?: string | number | bool
 }
 
 export default function TaskPage() {
+  const t = useT();
   const { taskId } = useParams<{ taskId: string }>();
   const { tasks, agents, updateTaskStatus, updateTaskNotes, initialize } = useStore();
   const { currentUser } = useAuthStore();
@@ -38,9 +33,16 @@ export default function TaskPage() {
   const [taskNotes, setTaskNotes] = useState('');
   const [saved, setSaved] = useState(false);
 
+  const STATUS_OPTIONS: { value: TaskStatus; label: string; icon: React.ReactNode; desc: string }[] = [
+    { value: 'not_started', label: t('status.not_started'), icon: <Circle size={16} />,      desc: t('task.swatNotStarted') },
+    { value: 'in_progress', label: t('status.in_progress'), icon: <Clock size={16} />,        desc: t('task.swatInProgress') },
+    { value: 'on_hold',     label: t('status.on_hold'),     icon: <PauseCircle size={16} />,  desc: t('task.swatOnHold') },
+    { value: 'completed',   label: t('status.completed'),   icon: <CheckCircle2 size={16} />, desc: t('task.swatCompleted') },
+  ];
+
   useEffect(() => { initialize(); }, [initialize]);
 
-  const task = tasks.find((t) => t.id === taskId);
+  const task = tasks.find((tk) => tk.id === taskId);
   useEffect(() => {
     if (task) setTaskNotes(task.notes || '');
   }, [task?.id]);
@@ -49,7 +51,6 @@ export default function TaskPage() {
 
   const agent = agents.find((a) => a.id === task.agentId);
 
-  // Only the assigned agent, admin, or supervisor may change status
   const canChangeStatus =
     currentUser?.role === 'admin' ||
     currentUser?.role === 'supervisor' ||
@@ -70,27 +71,27 @@ export default function TaskPage() {
 
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <Header title="Task Detail" subtitle={task.swatId || task.title} />
-      <div className="flex-1 overflow-y-auto p-6">
+      <Header title={t('task.title')} subtitle={task.swatId || task.title} />
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
         <button onClick={() => router.back()} className="flex items-center gap-1.5 text-sm text-slate-400 hover:text-white transition-colors mb-5">
-          <ArrowLeft size={16} /> Back
+          <ArrowLeft size={16} /> {t('task.back')}
         </button>
 
-        <div className="grid grid-cols-1 xl:grid-cols-3 gap-6">
+        <div className="grid grid-cols-1 xl:grid-cols-3 gap-5 sm:gap-6">
           {/* ── Main column ── */}
           <div className="xl:col-span-2 space-y-5">
 
             {/* Task info */}
-            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
+            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 sm:p-6">
               <div className="flex items-start gap-3 mb-4">
                 <div>
-                  <div className="flex items-center gap-2 mb-1">
+                  <div className="flex flex-wrap items-center gap-2 mb-1">
                     <span className="font-mono text-indigo-300 text-sm font-bold">{task.swatId || task.title}</span>
                     <span className={`px-2 py-0.5 rounded-full border text-xs ${STATUS_BG[task.status]}`}>
-                      {STATUS_LABELS[task.status]}
+                      {t(`status.${task.status}` as Parameters<typeof t>[0])}
                     </span>
                     <span className={`px-2 py-0.5 rounded-full border text-xs capitalize ${PRIORITY_COLORS[task.priority]}`}>
-                      {task.priority}
+                      {t(`priority.${task.priority}` as Parameters<typeof t>[0])}
                     </span>
                   </div>
                   {task.codif && (
@@ -103,7 +104,7 @@ export default function TaskPage() {
 
               {task.description && (
                 <div className="bg-slate-900/50 rounded-lg p-4 mb-5">
-                  <div className="text-xs text-slate-400 font-medium mb-2 uppercase tracking-wide">Commentaire</div>
+                  <div className="text-xs text-slate-400 font-medium mb-2 uppercase tracking-wide">{t('task.descTitle')}</div>
                   <pre className="text-xs text-slate-300 whitespace-pre-wrap leading-relaxed font-sans">{task.description}</pre>
                 </div>
               )}
@@ -126,7 +127,7 @@ export default function TaskPage() {
                 <div className="flex items-start gap-2">
                   <BarChart2 size={13} className="text-slate-500 mt-0.5 flex-shrink-0" />
                   <div>
-                    <div className="text-slate-500 mb-0.5">Est. Hours</div>
+                    <div className="text-slate-500 mb-0.5">{t('task.estHours')}</div>
                     <div className="text-white font-medium">{task.estimatedHours}h</div>
                   </div>
                 </div>
@@ -134,10 +135,10 @@ export default function TaskPage() {
             </div>
 
             {/* SWAT reference fields */}
-            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
+            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 sm:p-6">
               <h3 className="flex items-center gap-2 text-sm font-semibold text-white mb-4">
                 <Info size={14} />
-                SWAT References
+                {t('task.swatRefs')}
               </h3>
               <div className="grid grid-cols-2 sm:grid-cols-3 gap-x-6 gap-y-4">
                 <Field label="SWAT"       value={task.swatId} />
@@ -159,23 +160,23 @@ export default function TaskPage() {
             </div>
 
             {/* Status changer */}
-            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
-              <div className="flex items-center justify-between mb-4">
-                <h3 className="text-sm font-semibold text-white">Update Status</h3>
+            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 sm:p-6">
+              <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+                <h3 className="text-sm font-semibold text-white">{t('task.updateStatus')}</h3>
                 {!canChangeStatus && (
                   <div className="flex items-center gap-1.5 text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 px-3 py-1.5 rounded-lg">
                     <Lock size={12} />
-                    Only the assigned agent, supervisor, or admin can change status
+                    {t('task.lockMsg')}
                   </div>
                 )}
                 {canChangeStatus && currentUser && (
                   <span className="text-xs text-slate-400">
-                    Changing as <span className="text-indigo-300 font-medium">{currentUser.displayName}</span>
+                    {t('task.changingAs')} <span className="text-indigo-300 font-medium">{currentUser.displayName}</span>
                   </span>
                 )}
               </div>
 
-              <div className="grid grid-cols-2 gap-3 mb-5">
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-5">
                 {STATUS_OPTIONS.map((opt) => {
                   const isActive = task.status === opt.value;
                   return (
@@ -204,7 +205,7 @@ export default function TaskPage() {
 
               {canChangeStatus && (
                 <textarea
-                  placeholder="Add a note about this status change (optional)"
+                  placeholder={t('task.noteHint')}
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
                   rows={2}
@@ -214,10 +215,10 @@ export default function TaskPage() {
             </div>
 
             {/* Notes */}
-            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-6">
+            <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-4 sm:p-6">
               <h3 className="flex items-center gap-2 text-sm font-semibold text-white mb-4">
                 <FileText size={14} />
-                SWAT DESCR. / Notes
+                {t('task.descNotes')}
               </h3>
               <textarea
                 value={taskNotes}
@@ -233,7 +234,7 @@ export default function TaskPage() {
                 }`}
               >
                 <Save size={14} />
-                {saved ? 'Saved!' : 'Save Notes'}
+                {saved ? t('task.saved') : t('task.saveNotes')}
               </button>
             </div>
           </div>
@@ -243,7 +244,7 @@ export default function TaskPage() {
             <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
               <h3 className="flex items-center gap-2 text-sm font-semibold text-white mb-4">
                 <History size={14} />
-                Status History
+                {t('task.statusHistory')}
               </h3>
               <div className="space-y-3">
                 {[...task.statusHistory].reverse().map((change, i) => (
@@ -257,10 +258,10 @@ export default function TaskPage() {
                     />
                     <div className="bg-slate-900/50 rounded-lg p-3">
                       <span className={`text-xs font-semibold px-2 py-0.5 rounded-full border ${STATUS_BG[change.status]}`}>
-                        {STATUS_LABELS[change.status]}
+                        {t(`status.${change.status}` as Parameters<typeof t>[0])}
                       </span>
                       <div className="text-[11px] text-slate-400 mt-1.5">{formatDateTime(change.timestamp)}</div>
-                      <div className="text-[11px] text-slate-500">by {change.changedBy}</div>
+                      <div className="text-[11px] text-slate-500">{t('general.by')} {change.changedBy}</div>
                       {change.note && (
                         <div className="text-[11px] text-slate-400 mt-1 italic">"{change.note}"</div>
                       )}
@@ -272,15 +273,15 @@ export default function TaskPage() {
 
             <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5 text-xs space-y-2">
               <div className="flex justify-between">
-                <span className="text-slate-500">Task ID</span>
+                <span className="text-slate-500">{t('task.taskId')}</span>
                 <span className="text-slate-400 font-mono text-[10px]">{task.id}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Created</span>
+                <span className="text-slate-500">{t('task.created')}</span>
                 <span className="text-slate-400">{formatDateTime(task.createdAt)}</span>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Last Updated</span>
+                <span className="text-slate-500">{t('task.updated')}</span>
                 <span className="text-slate-400">{formatDateTime(task.updatedAt)}</span>
               </div>
               {task.prioriteNum !== undefined && (

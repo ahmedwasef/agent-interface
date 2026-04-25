@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { WeeklyStats } from '@/lib/types';
 import { useStore } from '@/lib/store';
+import { useT } from '@/lib/i18n';
 
 interface Props {
   stats: WeeklyStats[];
@@ -29,6 +30,7 @@ function DonutRing({ percent, color, size = 64 }: { percent: number; color: stri
 const rateColor = (r: number) => r >= 70 ? '#10B981' : r >= 40 ? '#F59E0B' : '#EF4444';
 
 export default function AgentPerformanceChart({ stats }: Props) {
+  const t = useT();
   const { agents } = useStore();
 
   const sorted = [...stats].sort((a, b) => b.completionRate - a.completionRate);
@@ -37,8 +39,8 @@ export default function AgentPerformanceChart({ stats }: Props) {
     <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
       <div className="flex items-center justify-between mb-5">
         <div>
-          <h3 className="text-sm font-semibold text-white">Task Distribution by Agent</h3>
-          <p className="text-xs text-slate-500 mt-0.5">Sorted by completion rate</p>
+          <h3 className="text-sm font-semibold text-white">{t('chart.agentDist')}</h3>
+          <p className="text-xs text-slate-500 mt-0.5">{t('chart.agentSub')}</p>
         </div>
       </div>
 
@@ -98,11 +100,11 @@ export default function AgentPerformanceChart({ stats }: Props) {
                 <div className="bg-slate-900 border border-slate-700 rounded-xl p-3 shadow-2xl text-xs w-36">
                   <div className="font-semibold text-white mb-2 truncate">{s.agentName}</div>
                   <div className="space-y-1">
-                    <div className="flex justify-between"><span className="text-emerald-400">Done</span><span className="text-white font-medium">{s.completed}</span></div>
-                    <div className="flex justify-between"><span className="text-blue-400">Active</span><span className="text-white font-medium">{s.inProgress}</span></div>
-                    <div className="flex justify-between"><span className="text-amber-400">Hold</span><span className="text-white font-medium">{s.onHold}</span></div>
-                    <div className="flex justify-between"><span className="text-slate-400">New</span><span className="text-white font-medium">{s.notStarted}</span></div>
-                    <div className="flex justify-between border-t border-slate-700 pt-1 mt-1"><span className="text-slate-300">Total</span><span className="text-white font-bold">{s.totalTasks}</span></div>
+                    <div className="flex justify-between"><span className="text-emerald-400">{t('agents.done')}</span><span className="text-white font-medium">{s.completed}</span></div>
+                    <div className="flex justify-between"><span className="text-blue-400">{t('agents.active')}</span><span className="text-white font-medium">{s.inProgress}</span></div>
+                    <div className="flex justify-between"><span className="text-amber-400">{t('agents.hold')}</span><span className="text-white font-medium">{s.onHold}</span></div>
+                    <div className="flex justify-between"><span className="text-slate-400">{t('agents.pending')}</span><span className="text-white font-medium">{s.notStarted}</span></div>
+                    <div className="flex justify-between border-t border-slate-700 pt-1 mt-1"><span className="text-slate-300">{t('kpi.total')}</span><span className="text-white font-bold">{s.totalTasks}</span></div>
                   </div>
                 </div>
                 <div className="w-2 h-2 bg-slate-900 border-r border-b border-slate-700 rotate-45 mx-auto -mt-1" />
@@ -114,18 +116,18 @@ export default function AgentPerformanceChart({ stats }: Props) {
 
       {/* Legend */}
       <div className="flex items-center gap-4 mt-5 pt-4 border-t border-slate-700/50 flex-wrap">
-        {[
-          { color: '#10B981', label: 'Completed' },
-          { color: '#3B82F6', label: 'In Progress' },
-          { color: '#F59E0B', label: 'On Hold' },
-          { color: '#6B7280', label: 'Not Started' },
-        ].map(({ color, label }) => (
-          <div key={label} className="flex items-center gap-1.5">
+        {([
+          ['#10B981', 'chart.completed'],
+          ['#3B82F6', 'chart.inProgress'],
+          ['#F59E0B', 'chart.onHold'],
+          ['#6B7280', 'chart.notStarted'],
+        ] as [string, Parameters<typeof t>[0]][]).map(([color, key]) => (
+          <div key={key} className="flex items-center gap-1.5">
             <div className="w-2.5 h-2.5 rounded-full" style={{ backgroundColor: color }} />
-            <span className="text-xs text-slate-400">{label}</span>
+            <span className="text-xs text-slate-400">{t(key)}</span>
           </div>
         ))}
-        <span className="ml-auto text-xs text-slate-500">Hover card for details · Click to open</span>
+        <span className="ml-auto text-xs text-slate-500 hidden sm:inline">{t('chart.hoverTip')}</span>
       </div>
     </div>
   );

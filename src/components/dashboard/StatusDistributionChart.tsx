@@ -2,7 +2,8 @@
 
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer, Legend } from 'recharts';
 import { Task } from '@/lib/types';
-import { STATUS_LABELS, STATUS_COLORS } from '@/lib/utils';
+import { STATUS_COLORS } from '@/lib/utils';
+import { useT } from '@/lib/i18n';
 
 interface Props {
   tasks: Task[];
@@ -28,25 +29,27 @@ const CustomTooltip = ({ active, payload }: any) => {
       <div className="flex items-center gap-2">
         <div className="w-3 h-3 rounded-full" style={{ background: payload[0].payload.fill }} />
         <span className="text-white font-semibold">{payload[0].name}</span>
-        <span className="text-slate-400">— {payload[0].value} tasks</span>
+        <span className="text-slate-400">— {payload[0].value}</span>
       </div>
     </div>
   );
 };
 
 export default function StatusDistributionChart({ tasks }: Props) {
+  const t = useT();
+
   const statuses = ['completed', 'in_progress', 'on_hold', 'not_started'] as const;
   const data = statuses
     .map((s) => ({
-      name: STATUS_LABELS[s],
-      value: tasks.filter((t) => t.status === s).length,
+      name: t(`status.${s}` as Parameters<typeof t>[0]),
+      value: tasks.filter((task) => task.status === s).length,
       fill: STATUS_COLORS[s],
     }))
     .filter((d) => d.value > 0);
 
   return (
     <div className="bg-slate-800/50 border border-slate-700/50 rounded-xl p-5">
-      <h3 className="text-sm font-semibold text-white mb-4">Status Distribution</h3>
+      <h3 className="text-sm font-semibold text-white mb-4">{t('chart.statusDist')}</h3>
       <ResponsiveContainer width="100%" height={360}>
         <PieChart>
           <Pie

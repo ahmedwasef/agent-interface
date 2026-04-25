@@ -15,6 +15,7 @@ import {
   FileSpreadsheet, Database, X, Users, ArrowRightLeft, FileDown,
   Edit2, Save, Shield, User, Eye, EyeOff, Lock,
 } from 'lucide-react';
+import { useT } from '@/lib/i18n';
 
 // ─────────────────────────────────────────────────────────────────────────────
 // SWAT column helpers
@@ -47,17 +48,11 @@ const AGENT_COLORS = [
   '#1E40AF','#D946EF',
 ];
 
-const TABS = [
-  { id: 'import',   label: 'Import',        icon: Upload },
-  { id: 'tasks',    label: 'Tasks',         icon: Database },
-  { id: 'reassign', label: 'Reassign',      icon: ArrowRightLeft },
-  { id: 'users',    label: 'Users & Agents',icon: Users },
-  { id: 'export',   label: 'Export',        icon: FileDown },
-] as const;
-type TabId = typeof TABS[number]['id'];
+type TabId = 'import' | 'tasks' | 'reassign' | 'users' | 'export';
 
 // ─────────────────────────────────────────────────────────────────────────────
 export default function AdminPage() {
+  const t = useT();
   const {
     tasks, agents, importTasks, deleteTask, deleteTasks,
     updateTask, reassignTasks, addAgent, updateAgent, removeAgent,
@@ -70,16 +65,24 @@ export default function AdminPage() {
 
   const adminOnly = isAdmin();
 
+  const TABS: { id: TabId; label: string; icon: React.ElementType }[] = [
+    { id: 'import',   label: t('admin.import'),  icon: Upload },
+    { id: 'tasks',    label: t('admin.tasks'),   icon: Database },
+    { id: 'reassign', label: t('admin.reassign'),icon: ArrowRightLeft },
+    { id: 'users',    label: t('admin.users'),   icon: Users },
+    { id: 'export',   label: t('admin.export'),  icon: FileDown },
+  ];
+
   return (
     <div className="flex flex-col h-full overflow-hidden">
-      <Header title="Admin Panel" subtitle="Full control — import, manage, reassign, export" onHelp={resetOnboarding} />
-      <div className="flex-1 overflow-y-auto p-6">
+      <Header title={t('admin.title')} subtitle={t('admin.subtitle')} onHelp={resetOnboarding} />
+      <div className="flex-1 overflow-y-auto p-4 sm:p-6">
 
         {/* Role notice */}
         {!adminOnly && (
           <div className="mb-4 flex items-center gap-2 px-4 py-2.5 bg-amber-500/10 border border-amber-500/30 rounded-lg text-sm text-amber-300">
             <Lock size={14} />
-            You have <strong>read-only</strong> access. Contact admin for elevated permissions.
+            {t('admin.readOnly')}
           </div>
         )}
 

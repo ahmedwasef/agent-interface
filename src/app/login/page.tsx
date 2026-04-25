@@ -3,9 +3,11 @@
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/lib/authStore';
+import { useT } from '@/lib/i18n';
 import { BarChart2, Eye, EyeOff, Lock, User, ShieldCheck } from 'lucide-react';
 
 export default function LoginPage() {
+  const t = useT();
   const { login, currentUser } = useAuthStore();
   const router = useRouter();
   const [username, setUsername] = useState('');
@@ -22,7 +24,7 @@ export default function LoginPage() {
     e.preventDefault();
     setError('');
     setLoading(true);
-    await new Promise((r) => setTimeout(r, 400)); // brief delay for UX
+    await new Promise((r) => setTimeout(r, 400));
     const result = login(username, password);
     setLoading(false);
     if (result.ok) {
@@ -47,24 +49,23 @@ export default function LoginPage() {
         </div>
 
         <div>
-          <h1 className="text-4xl font-bold text-white mb-4 leading-tight">
-            Track. Assign.<br />Deliver.
+          <h1 className="text-4xl font-bold text-white mb-4 leading-tight whitespace-pre-line">
+            {t('auth.tagline')}
           </h1>
           <p className="text-slate-400 text-sm leading-relaxed max-w-sm">
-            Real-time SWAT task dashboard for your team. Monitor weekly performance,
-            update task statuses, and export directly to PowerBI.
+            {t('auth.description')}
           </p>
         </div>
 
         <div className="grid grid-cols-3 gap-4">
           {[
-            { label: 'Agents', value: '17' },
-            { label: 'Live Tasks', value: '∞' },
-            { label: 'Export Formats', value: '4' },
-          ].map(({ label, value }) => (
-            <div key={label} className="bg-white/5 rounded-xl p-4 border border-white/10">
+            { labelKey: 'auth.agents' as const,    value: '17' },
+            { labelKey: 'auth.liveTasks' as const,  value: '∞' },
+            { labelKey: 'auth.formats' as const,    value: '4' },
+          ].map(({ labelKey, value }) => (
+            <div key={labelKey} className="bg-white/5 rounded-xl p-4 border border-white/10">
               <div className="text-2xl font-bold text-white mb-1">{value}</div>
-              <div className="text-xs text-slate-400">{label}</div>
+              <div className="text-xs text-slate-400">{t(labelKey)}</div>
             </div>
           ))}
         </div>
@@ -84,16 +85,16 @@ export default function LoginPage() {
           <div className="mb-8">
             <div className="flex items-center gap-2 mb-2">
               <ShieldCheck size={18} className="text-indigo-400" />
-              <span className="text-xs text-indigo-400 font-medium uppercase tracking-wider">Secure Access</span>
+              <span className="text-xs text-indigo-400 font-medium uppercase tracking-wider">{t('auth.secure')}</span>
             </div>
-            <h2 className="text-2xl font-bold text-white">Sign in</h2>
-            <p className="text-slate-400 text-sm mt-1">Enter your credentials to continue</p>
+            <h2 className="text-2xl font-bold text-white">{t('auth.title')}</h2>
+            <p className="text-slate-400 text-sm mt-1">{t('auth.subtitle')}</p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             {/* Username */}
             <div>
-              <label className="text-xs text-slate-400 font-medium mb-1.5 block">Username</label>
+              <label className="text-xs text-slate-400 font-medium mb-1.5 block">{t('auth.username')}</label>
               <div className="relative">
                 <User size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                 <input
@@ -110,7 +111,7 @@ export default function LoginPage() {
 
             {/* Password */}
             <div>
-              <label className="text-xs text-slate-400 font-medium mb-1.5 block">Password</label>
+              <label className="text-xs text-slate-400 font-medium mb-1.5 block">{t('auth.password')}</label>
               <div className="relative">
                 <Lock size={15} className="absolute left-3 top-1/2 -translate-y-1/2 text-slate-500" />
                 <input
@@ -148,35 +149,35 @@ export default function LoginPage() {
               {loading ? (
                 <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Signing in…
+                  {t('auth.signingIn')}
                 </>
               ) : (
-                'Sign In'
+                t('auth.signIn')
               )}
             </button>
           </form>
 
-          {/* Credentials hint (visible for demo) */}
+          {/* Credentials hint */}
           <div className="mt-8 p-4 bg-slate-800/60 border border-slate-700/50 rounded-xl">
-            <div className="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">Demo Credentials</div>
+            <div className="text-xs font-semibold text-slate-400 mb-2 uppercase tracking-wide">{t('auth.demoCreds')}</div>
             <div className="space-y-1.5 text-xs">
               <div className="flex justify-between">
-                <span className="text-slate-500">Admin (full access):</span>
+                <span className="text-slate-500">{t('auth.admin')}:</span>
                 <code className="text-indigo-300">admin / Admin@SWAT2026</code>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Supervisor:</span>
+                <span className="text-slate-500">{t('auth.supervisor')}:</span>
                 <code className="text-indigo-300">damien.marie / Super@SWAT2026</code>
               </div>
               <div className="flex justify-between">
-                <span className="text-slate-500">Agent (any):</span>
+                <span className="text-slate-500">{t('auth.agent')}:</span>
                 <code className="text-indigo-300">ahmed.amasha / Agent@2026</code>
               </div>
             </div>
           </div>
 
           <p className="text-center text-xs text-slate-600 mt-6">
-            SWAT Agent Interface · Secure Access Portal
+            {t('auth.portal')}
           </p>
         </div>
       </div>
