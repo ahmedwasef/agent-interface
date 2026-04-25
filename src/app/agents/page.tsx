@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
 import { useStore } from '@/lib/store';
 import { getWeeklyStats } from '@/lib/utils';
@@ -84,8 +84,15 @@ export default function AgentsPage() {
   const router = useRouter();
   const [search, setSearch] = useState('');
   const [selectedId, setSelectedId] = useState<string | null>(null);
+  const detailRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => { initialize(); }, [initialize]);
+
+  useEffect(() => {
+    if (selectedId && detailRef.current) {
+      detailRef.current.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    }
+  }, [selectedId]);
 
   const stats = getWeeklyStats(tasks, agents);
   const filtered = agents.filter((a) => a.name.toLowerCase().includes(search.toLowerCase()));
@@ -148,7 +155,7 @@ export default function AgentsPage() {
 
           {/* Detail panel */}
           {selected && selectedStats && (
-            <div className="rounded-2xl overflow-hidden border border-slate-700/50 bg-slate-800/50">
+            <div ref={detailRef} className="rounded-2xl overflow-hidden border border-slate-700/50 bg-slate-800/50">
               <div className="grid grid-cols-1 lg:grid-cols-[auto_1fr_auto] gap-0">
 
                 {/* Ring */}
