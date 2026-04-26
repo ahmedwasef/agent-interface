@@ -1,73 +1,73 @@
 import { Task, TaskStatus, Priority, StatusChange } from './types';
 import { AGENTS } from './agents';
 
-// Real SWAT system values from PowerBI extract
+// Dummy data — real values removed for privacy
 const CODIF_VALUES = [
-  'ATT MET', 'ATT ING', 'ATT GI', 'GO', 'GO MET', 'GO CSD', 'GO ING', 'ATT PROD',
+  'WAIT-ENG', 'WAIT-MTH', 'WAIT-QC', 'READY', 'READY-ENG', 'READY-QC', 'READY-MTH', 'WAIT-PARTS',
 ];
 const GROUPES = [
-  'MET-ELEC13', 'MET-ELEC14', 'MET-ELEC17', 'MET-CFG55', 'MET-CFG62',
-  'MET-SUP55', 'MET-NPI52', 'MET-ELEC11',
+  'GRP-ELEC-A', 'GRP-ELEC-B', 'GRP-ELEC-C', 'GRP-CFG-A', 'GRP-CFG-B',
+  'GRP-SUP-A', 'GRP-NPI-A', 'GRP-ELEC-D',
 ];
-const PROJETS = ['G025-MD', 'K1799', 'K1809', 'BDE-G5500', 'BDE-G6500'];
-const AVIONS  = ['G025-MD', '60208', '60218', 'BDE-G5500', 'BDE-G6500'];
-const PROGRAMMES = ['Lib G7500', 'Lib G6500', 'Lib G5500', 'G5500', 'G6500', 'G7500'];
-const PERIODES = ['PREPROD', 'TBD', 'PIS', 'PRECONV'];
-const SUPERVISORS = ['Damien Marie', 'Jerome Caissy', 'Annabelle Almeida'];
-const MANAGERS = ['Annabelle Almeida'];
+const PROJETS = ['PROJ-001', 'PROJ-002', 'PROJ-003', 'PROJ-004', 'PROJ-005'];
+const AVIONS  = ['AC-001', 'AC-002', 'AC-003', 'AC-004', 'AC-005'];
+const PROGRAMMES = ['Program Alpha', 'Program Beta', 'Program Gamma', 'Program Delta', 'Program Echo', 'Program Zeta'];
+const PERIODES = ['PHASE-1', 'TBD', 'PHASE-2', 'PHASE-3'];
+const SUPERVISORS = ['Damien Marie', 'Marc Tremblay', 'Sophie Leclerc'];
+const MANAGERS = ['Sophie Leclerc'];
 
 const POSITIONS = [
-  '350', 'AMG-SA150', 'AMR-SA150', 'AHG150', '10', '', '', '', '',
+  'POS-A', 'POS-B1', 'POS-B2', 'POS-C1', 'POS-D', '', '', '', '',
 ];
 
 const SWAT_DESCRIPTIONS = [
   {
-    title: 'Circuit breakers not assigned per electrical drawing',
-    description: 'Instructions de travail: KT8124-V0041\nEnjeu technique: Circuit breakers not assigned per electrical drawing.\nEnjeu d\'Ingénierie: Electrical drawing\nAmélioration de procédé: N/A',
+    title: 'Issue type A',
+    description: 'Work instructions: Bla bla bla bla bla bla.\nTechnical issue: Bla bla bla bla bla bla bla bla bla.\nEngineering issue: Bla bla bla bla bla.\nProcess improvement: N/A',
   },
   {
-    title: 'Bundle routing blocking pocket door track',
-    description: 'Instructions de travail: Verify routing per BAPS 145-003 and 145-213.\nEnjeu technique: Porte MID LH, pocket door ne s\'ouvre pas en raison de l\'épaisseur des bundles qui frotte sur la track.\nEnjeu d\'Ingénierie: Review bundle thickness tolerance.\nAmélioration de procédé: Follow BAPS 145-003 and 145-213 guidelines.',
+    title: 'Issue type B',
+    description: 'Work instructions: Bla bla bla bla bla bla.\nTechnical issue: Bla bla bla bla bla bla bla bla bla.\nEngineering issue: Bla bla bla bla bla.\nProcess improvement: Bla bla bla bla.',
   },
   {
-    title: 'Missing drawing revision — RFC incorporation required',
-    description: 'Instructions de travail: INCORPORATION DES NOUVEAU DWG SI REQUIS SUITE AU RFC\nEnjeu technique: Drawing revision mismatch on cahier baseline.\nEnjeu d\'Ingénierie: Verify RFC applicability on effectivity range.\nAmélioration de procédé: Align DWG revisions before production.',
+    title: 'Issue type C',
+    description: 'Work instructions: Bla bla bla bla bla bla.\nTechnical issue: Bla bla bla bla bla bla bla bla bla.\nEngineering issue: Bla bla bla bla bla.\nProcess improvement: Bla bla bla bla.',
   },
   {
-    title: 'SUB cahier hours deficiency — multiple termination types',
-    description: 'Instructions de travail: Review all SUB cahiers right and left side.\nEnjeu technique: Cahier de 6.42 heures contient CANBUS, MULTIPLE SPLICES, QUADRAX, OCTAX.\nEnjeu d\'Ingénierie: Methods must revise hours for OCTAX, QUADRAX, HDMI, CANBUS.\nAmélioration de procédé: Include interface gauche et droite avec tous types de terminaisons.',
+    title: 'Issue type D',
+    description: 'Work instructions: Bla bla bla bla bla bla.\nTechnical issue: Bla bla bla bla bla bla bla bla bla.\nEngineering issue: Bla bla bla bla bla.\nProcess improvement: Bla bla bla bla.',
   },
   {
-    title: 'QUADRAX contacts not locking in dielectric — open circuit risk',
-    description: 'Instructions de travail: N/A\nEnjeu technique: Connector A5495P1 QUADRAX — all 4 contacts do not lock with dielectric. Causing open circuit under vibration.\nEnjeu d\'Ingénierie: Verify contact retention force vs. dielectric specification.\nAmélioration de procédé: Evaluate alternate QUADRAX dielectric or contact p/n.',
+    title: 'Issue type E',
+    description: 'Work instructions: N/A\nTechnical issue: Bla bla bla bla bla bla bla bla bla.\nEngineering issue: Bla bla bla bla bla.\nProcess improvement: Bla bla bla bla.',
   },
   {
-    title: 'Wrong cahier reference — connector P4505 inscription error',
-    description: 'Instructions de travail: Verify cahier cross-reference for connector P4505 (Zone N3).\nEnjeu technique: Perte de temps à trouver le cahier où sont inscrites les informations pour P4505.\nEnjeu d\'Ingénierie: N/A\nAmélioration de procédé: Inscrire les informations dans le bon cahier de montage.',
+    title: 'Issue type F',
+    description: 'Work instructions: Bla bla bla bla bla bla.\nTechnical issue: Bla bla bla bla bla bla bla bla bla.\nEngineering issue: N/A\nProcess improvement: Bla bla bla bla.',
   },
   {
-    title: 'RESALE — Add Starlink provision prior delivery',
-    description: 'Instructions de travail: N/A\nEnjeu technique: Starlink provision missing from resale aircraft documentation.\nEnjeu d\'Ingénierie: Confirm Starlink effectivity and drawing reference.\nAmélioration de procédé: N/A',
+    title: 'Issue type G',
+    description: 'Work instructions: N/A\nTechnical issue: Bla bla bla bla bla bla bla bla bla.\nEngineering issue: Bla bla bla bla bla.\nProcess improvement: N/A',
   },
   {
-    title: 'Stateroom wardrobe — missing drawing data for data transfer',
-    description: 'Instructions de travail: N/A\nEnjeu technique: N/A\nEnjeu d\'Ingénierie: Missing information on G25070480, G25070481, G25070485-001. PCR 64130 solutions did not account for build-to-print constraint.\nAmélioration de procédé: N/A',
+    title: 'Issue type H',
+    description: 'Work instructions: N/A\nTechnical issue: N/A\nEngineering issue: Bla bla bla bla bla bla bla bla bla.\nProcess improvement: N/A',
   },
   {
-    title: 'Bed headboard cable routing — bend radius violation at zone B620',
-    description: 'Instructions de travail: Opération 10 : routing\nEnjeu technique: Routing du câble GBH0047-AOG-26 du connecteur A4671J3 au A5325P3 ne respecte pas le bend radius du câble.\nEnjeu d\'Ingénierie: Voir le routing sur autres harnais déjà faits.\nAmélioration de procédé: N/A',
+    title: 'Issue type I',
+    description: 'Work instructions: Bla bla bla bla bla bla.\nTechnical issue: Bla bla bla bla bla bla bla bla bla.\nEngineering issue: Bla bla bla bla bla.\nProcess improvement: N/A',
   },
   {
-    title: 'PVA HDR++ cahier correction — wrong zone assignment B430',
-    description: 'Instructions de travail: Page 16 de 24 zone B430 — connecteur A4400J1 et câbles GBC0080SH, GBC0105-AOG-22 incorrectement assignés.\nEnjeu technique: Connecteur A4400J1 et câbles ne vont pas dans zone B430.\nEnjeu d\'Ingénierie: N/A\nAmélioration de procédé: Ils vont au connecteur A4400J2 zone B420.',
+    title: 'Issue type J',
+    description: 'Work instructions: Bla bla bla bla bla bla.\nTechnical issue: Bla bla bla bla bla bla bla bla bla.\nEngineering issue: N/A\nProcess improvement: Bla bla bla bla.',
   },
   {
-    title: 'SSE AFT WAP Starlink integration — RFC suivi',
-    description: 'Instructions de travail: Suivi RFC-115053 SSE AFT WAP Starlink integration verification.\nEnjeu technique: N/A\nEnjeu d\'Ingénierie: N/A\nAmélioration de procédé: N/A',
+    title: 'Issue type K',
+    description: 'Work instructions: Bla bla bla bla bla bla.\nTechnical issue: N/A\nEngineering issue: N/A\nProcess improvement: N/A',
   },
   {
-    title: 'FTER-BN700-247901 incorporation — provision GS et CR à ajouter',
-    description: 'Instructions de travail: Incorporer FTER-BN700-247901 [-H].\nEnjeu technique: N/A\nEnjeu d\'Ingénierie: N/A\nAmélioration de procédé: N/A',
+    title: 'Issue type L',
+    description: 'Work instructions: Bla bla bla bla bla bla.\nTechnical issue: N/A\nEngineering issue: N/A\nProcess improvement: N/A',
   },
 ];
 
@@ -84,7 +84,7 @@ function randBetween(min: number, max: number): number {
 }
 
 function swatCounter() {
-  let n = 229000 + randBetween(100, 999);
+  let n = 100000 + randBetween(100, 999);
   return () => {
     n += randBetween(1, 50);
     return `SW-${String(Math.floor(n / 1000)).padStart(3, '0')}-${String(n % 1000).padStart(3, '0')}`;
@@ -209,7 +209,7 @@ export function generateMockTasks(): Task[] {
           projet,
           avion,
           position: pick(POSITIONS),
-          cahier: `TRSW-${swatId.replace('SW-', '')}-${String(randBetween(1, 20)).padStart(2, '0')}`,
+          cahier: `WP-${swatId.replace('SW-', '')}-${String(randBetween(1, 20)).padStart(2, '0')}`,
           rv: Math.random() > 0.5 ? `RV-${randBetween(100, 999)}-${randBetween(100, 999)} A` : '',
           groupe: pick(GROUPES),
           rfc: Math.random() > 0.4 ? `RFC-${randBetween(110000, 120000)}` : '',

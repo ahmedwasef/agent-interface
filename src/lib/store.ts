@@ -207,7 +207,7 @@ export const useStore = create<AppStore>()(
       clearAllTasks: () => set({ tasks: [], initialized: false }),
     }),
     {
-      name: 'agent-interface-store',
+      name: 'agent-interface-store-v2',
       partialize: (state) => ({
         tasks: state.tasks,
         agents: state.agents,

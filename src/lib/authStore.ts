@@ -17,45 +17,45 @@ export interface LoginUser {
   createdAt: string;
 }
 
-// ── Default credentials ──────────────────────────────────────────────────────
+// ── Default credentials (demo only — not real passwords) ─────────────────────
 const DEFAULT_USERS: LoginUser[] = [
   {
     id: 'u0',
     username: 'admin',
-    password: 'Admin@SWAT2026',
+    password: 'Admin@Demo2026',
     role: 'admin',
     displayName: 'Administrator',
-    email: 'admin@swat.ca',
+    email: 'admin@example.com',
     active: true,
     createdAt: new Date().toISOString(),
   },
   {
     id: 'u1',
     username: 'damien.marie',
-    password: 'Super@SWAT2026',
+    password: 'Demo@Supervisor1',
     role: 'supervisor',
     agentId: '5',
     displayName: 'Damien Marie',
-    email: 'damien.marie@swat.ca',
+    email: 'damien.marie@example.com',
     active: true,
     createdAt: new Date().toISOString(),
   },
-  { id: 'u2',  username: 'ahmed.amasha',    password: 'Agent@2026', role: 'agent', agentId: '1',  displayName: 'Ahmed AMasha',            email: 'ahmed.amasha@swat.ca',    active: true, createdAt: new Date().toISOString() },
-  { id: 'u3',  username: 'alejandro',        password: 'Agent@2026', role: 'agent', agentId: '2',  displayName: 'Gonzalez Alejandro Munoz',email: 'alejandro@swat.ca',        active: true, createdAt: new Date().toISOString() },
-  { id: 'u4',  username: 'brahim.hamimoum', password: 'Agent@2026', role: 'agent', agentId: '3',  displayName: 'Brahim Hamimoum',         email: 'brahim.hamimoum@swat.ca', active: true, createdAt: new Date().toISOString() },
-  { id: 'u5',  username: 'constance.fode',  password: 'Agent@2026', role: 'agent', agentId: '4',  displayName: 'Constance Fode',          email: 'constance.fode@swat.ca',  active: true, createdAt: new Date().toISOString() },
-  { id: 'u6',  username: 'edgar.castro',    password: 'Agent@2026', role: 'agent', agentId: '6',  displayName: 'Edgar Castro Zambrano',   email: 'edgar.castro@swat.ca',    active: true, createdAt: new Date().toISOString() },
-  { id: 'u7',  username: 'francis.poirier', password: 'Agent@2026', role: 'agent', agentId: '7',  displayName: 'Francis Poirier',         email: 'francis.poirier@swat.ca', active: true, createdAt: new Date().toISOString() },
-  { id: 'u8',  username: 'gabriel.april',   password: 'Agent@2026', role: 'agent', agentId: '8',  displayName: 'Gabriel April',           email: 'gabriel.april@swat.ca',   active: true, createdAt: new Date().toISOString() },
-  { id: 'u9',  username: 'hassan',           password: 'Agent@2026', role: 'agent', agentId: '9',  displayName: 'Hassan Chamkmaki',        email: 'hassan@swat.ca',           active: true, createdAt: new Date().toISOString() },
-  { id: 'u10', username: 'kamel.belblidi',  password: 'Agent@2026', role: 'agent', agentId: '10', displayName: 'Kamel Belblidi',          email: 'kamel.belblidi@swat.ca',  active: true, createdAt: new Date().toISOString() },
-  { id: 'u11', username: 'kelly',            password: 'Agent@2026', role: 'agent', agentId: '11', displayName: 'Paradowski Kelly',        email: 'kelly@swat.ca',            active: true, createdAt: new Date().toISOString() },
-  { id: 'u12', username: 'martha.jimenez',  password: 'Agent@2026', role: 'agent', agentId: '12', displayName: 'Martha Jimenez',          email: 'martha.jimenez@swat.ca',  active: true, createdAt: new Date().toISOString() },
-  { id: 'u13', username: 'sarim.ramos',     password: 'Agent@2026', role: 'agent', agentId: '13', displayName: 'Sarim Ramos',             email: 'sarim.ramos@swat.ca',     active: true, createdAt: new Date().toISOString() },
-  { id: 'u14', username: 'sepideh.amiri',   password: 'Agent@2026', role: 'agent', agentId: '14', displayName: 'Sepideh Amiri',           email: 'sepideh.amiri@swat.ca',   active: true, createdAt: new Date().toISOString() },
-  { id: 'u15', username: 'thomas',           password: 'Agent@2026', role: 'agent', agentId: '15', displayName: 'Thomas Houdebert',        email: 'thomas@swat.ca',           active: true, createdAt: new Date().toISOString() },
-  { id: 'u16', username: 'vincent',          password: 'Agent@2026', role: 'agent', agentId: '16', displayName: 'Vincent Rancourt',        email: 'vincent@swat.ca',          active: true, createdAt: new Date().toISOString() },
-  { id: 'u17', username: 'vitalie',          password: 'Agent@2026', role: 'agent', agentId: '17', displayName: 'Vitalie Mihaila',         email: 'vitalie@swat.ca',          active: true, createdAt: new Date().toISOString() },
+  { id: 'u2',  username: 'ahmed.amasha',    password: 'Demo@Agent1', role: 'agent', agentId: '1',  displayName: 'Ahmed AMasha',            email: 'agent01@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u3',  username: 'alejandro',        password: 'Demo@Agent1', role: 'agent', agentId: '2',  displayName: 'Gonzalez Alejandro Munoz',email: 'agent02@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u4',  username: 'brahim.hamimoum', password: 'Demo@Agent1', role: 'agent', agentId: '3',  displayName: 'Brahim Hamimoum',         email: 'agent03@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u5',  username: 'constance.fode',  password: 'Demo@Agent1', role: 'agent', agentId: '4',  displayName: 'Constance Fode',          email: 'agent04@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u6',  username: 'edgar.castro',    password: 'Demo@Agent1', role: 'agent', agentId: '6',  displayName: 'Edgar Castro Zambrano',   email: 'agent05@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u7',  username: 'francis.poirier', password: 'Demo@Agent1', role: 'agent', agentId: '7',  displayName: 'Francis Poirier',         email: 'agent06@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u8',  username: 'gabriel.april',   password: 'Demo@Agent1', role: 'agent', agentId: '8',  displayName: 'Gabriel April',           email: 'agent07@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u9',  username: 'hassan',           password: 'Demo@Agent1', role: 'agent', agentId: '9',  displayName: 'Hassan Chamkmaki',        email: 'agent08@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u10', username: 'kamel.belblidi',  password: 'Demo@Agent1', role: 'agent', agentId: '10', displayName: 'Kamel Belblidi',          email: 'agent09@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u11', username: 'kelly',            password: 'Demo@Agent1', role: 'agent', agentId: '11', displayName: 'Paradowski Kelly',        email: 'agent10@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u12', username: 'martha.jimenez',  password: 'Demo@Agent1', role: 'agent', agentId: '12', displayName: 'Martha Jimenez',          email: 'agent11@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u13', username: 'sarim.ramos',     password: 'Demo@Agent1', role: 'agent', agentId: '13', displayName: 'Sarim Ramos',             email: 'agent12@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u14', username: 'sepideh.amiri',   password: 'Demo@Agent1', role: 'agent', agentId: '14', displayName: 'Sepideh Amiri',           email: 'agent13@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u15', username: 'thomas',           password: 'Demo@Agent1', role: 'agent', agentId: '15', displayName: 'Thomas Houdebert',        email: 'agent14@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u16', username: 'vincent',          password: 'Demo@Agent1', role: 'agent', agentId: '16', displayName: 'Vincent Rancourt',        email: 'agent15@example.com', active: true, createdAt: new Date().toISOString() },
+  { id: 'u17', username: 'vitalie',          password: 'Demo@Agent1', role: 'agent', agentId: '17', displayName: 'Vitalie Mihaila',         email: 'agent16@example.com', active: true, createdAt: new Date().toISOString() },
 ];
 
 function genId() { return Math.random().toString(36).slice(2, 11) + Date.now().toString(36); }
@@ -125,7 +125,7 @@ export const useAuthStore = create<AuthStore>()(
       canEdit:      () => ['admin', 'supervisor'].includes(get().currentUser?.role ?? ''),
     }),
     {
-      name: 'agent-auth-store',
+      name: 'agent-auth-store-v2',
       partialize: (s) => ({ users: s.users, currentUser: s.currentUser, sessionExpiry: s.sessionExpiry }),
     }
   )
