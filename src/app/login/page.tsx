@@ -163,15 +163,15 @@ export default function LoginPage() {
             <div className="space-y-1.5 text-xs">
               <div className="flex justify-between">
                 <span className="text-slate-500">{t('auth.admin')}:</span>
-                <code className="text-indigo-300">admin / Admin@SWAT2026</code>
+                <code className="text-indigo-300">admin / admin123</code>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">{t('auth.supervisor')}:</span>
-                <code className="text-indigo-300">damien.marie / Super@SWAT2026</code>
+                <code className="text-indigo-300">damien.marie / super123</code>
               </div>
               <div className="flex justify-between">
                 <span className="text-slate-500">{t('auth.agent')}:</span>
-                <code className="text-indigo-300">ahmed.amasha / Agent@2026</code>
+                <code className="text-indigo-300">ahmed.amasha / agent123</code>
               </div>
             </div>
           </div>

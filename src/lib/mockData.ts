@@ -218,7 +218,7 @@ export function generateMockTasks(): Task[] {
           superviseur: pick(SUPERVISORS),
           programme: pick(PROGRAMMES),
           manager: pick(MANAGERS),
-          pctProd: 0,
+          pctProd: status === 'completed' ? 100 : status === 'in_progress' ? randBetween(20, 80) : status === 'on_hold' ? randBetween(5, 40) : 0,
           dt1: randBetween(-90, 30),
           dt2: randBetween(0, 20),
           harmoManuel: Math.random() > 0.8,
